@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import NavbarComponent from './components/Navbar';
 import {Routes, Route } from 'react-router-dom';
 import ProductsAdmin from './pages/ProductsAdmin';
+import ProductDetail from './pages/ProductDetail';
 
 
 // FUNCTIONAL COMPONENT
@@ -22,6 +23,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />}/>
         <Route path="/products" element={<ProductsPage />}/>
         <Route path="/products/admin" element={<ProductsAdmin />}/>
+        <Route path="/product/detail" element={<ProductDetail />}/>
       </Routes>
     </div>
   );
