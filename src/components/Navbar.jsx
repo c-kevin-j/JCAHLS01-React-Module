@@ -1,7 +1,7 @@
 import React from "react"
-import { Navbar, NavbarBrand, NavbarToggler, Collapse, Nav, NavItem, NavbarText, Button, ButtonGroup } from 'reactstrap'
+import { Navbar, NavbarBrand, NavbarToggler, Collapse, Nav, NavItem, NavbarText, Button, ButtonGroup, DropdownToggle, Dropdown, DropdownMenu, DropdownItem } from 'reactstrap'
 import ModalLogin from "./ModalLogin"
-
+import { useSelector } from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
 
 const NavbarComponent = (props) => {
@@ -10,12 +10,18 @@ const NavbarComponent = (props) => {
 
   const [openCollapse, setOpenCollapse] = React.useState(false)
   const [openModal, setOpenModal] = React.useState(false)
-
+  const [openDropdown, setOpenDropdown] = React.useState(false)
 
   const handleLogin = (inputEmail, inputPassword) => {
     console.log("email",inputEmail)
     console.log("password",inputPassword)
   }
+
+  const { username } = useSelector((state) => {
+    return {
+        username: state.usersReducer.username
+    }
+  })
 
   return (
     <div>
@@ -45,7 +51,7 @@ const NavbarComponent = (props) => {
             </NavItem>
           </Nav>
           <NavbarText>
-            <ButtonGroup>
+          {/* <ButtonGroup>
               <Button color='primary' onClick={() => setOpenModal(!openModal)}>
                 Login
               </Button>
@@ -53,7 +59,7 @@ const NavbarComponent = (props) => {
                 openModal = {openModal}
                 toggleOpen={() => setOpenModal(!openModal)}
                 handleLogin = {handleLogin}
-              />
+              /> */}
               {/* <Modal isOpen={openModal}>
                 <ModalHeader >
                   Login Form
@@ -71,10 +77,46 @@ const NavbarComponent = (props) => {
                 </ModalFooter>
               </Modal> */}
 
+              {/* <Button color='secondary' outline onClick={()=>navigate("/register")}>
+                Register {username}
+              </Button>
+            </ButtonGroup> */}
+            
+            {
+              !username ?
+              <ButtonGroup>
+              <Button color='primary' onClick={() => setOpenModal(!openModal)}>
+                Login
+              </Button>
+              <ModalLogin 
+                openModal = {openModal}
+                toggleOpen={() => setOpenModal(!openModal)}
+                handleLogin = {handleLogin}
+              />
+
               <Button color='secondary' outline onClick={()=>navigate("/register")}>
                 Register
               </Button>
             </ButtonGroup>
+              :
+              <Dropdown isOpen={openDropdown} toggle={()=>setOpenDropdown(!openDropdown)} >
+                <DropdownToggle onClick={()=>setOpenDropdown(!openDropdown)}>
+                  {username}
+                </DropdownToggle>
+                <DropdownMenu end>
+                  <DropdownItem>
+                    Profile
+                  </DropdownItem>
+                  <DropdownItem>
+                    Cart
+                  </DropdownItem>
+                  <DropdownItem>
+                    Transactions
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            }
+            
           </NavbarText>
         </Collapse>
       </Navbar>

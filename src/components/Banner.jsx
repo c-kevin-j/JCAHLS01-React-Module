@@ -30,7 +30,6 @@ const Banner = (props) => {
     Axios.get(`${API_URL}/banner`)
     .then((response)=>{
       // jika berhasil mendapatkan response
-      console.log("From functional component:",response.data);
       setBannerList( response.data )
     }).catch((error)=>{
       // jika gagal mendapatkan response

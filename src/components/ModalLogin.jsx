@@ -1,5 +1,9 @@
 import React from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, InputGroup, InputGroupText} from "reactstrap";
+import Axios from "axios";
+import { API_URL } from "../helper";
+import { useDispatch } from "react-redux";
+import { loginAction } from "../redux/actions/usersAction";
 
 const ModalLogin = (props) => {
   let email=""
@@ -8,6 +12,26 @@ const ModalLogin = (props) => {
   const buttonLogin = () => {
     props.handleLogin(email,password)
   }
+  const dispatch = useDispatch();
+
+  const getUser = () => {
+    Axios.get(`${API_URL}/users?email=${inForm.email}`)
+        .then((response) => {
+            // jika berhasil mendapatkan response
+            console.log("From Component :", response.data[0]);
+            // setDbProducts(response.data)
+            if (inForm.password === response.data[0].password){
+              dispatch(loginAction(response.data[0]))
+              props.toggleOpen()
+            } else {
+              alert("Password Salah")
+            }
+        }).catch((error) => {
+            // jika tidak berhasil mendapatkan response
+            alert("Email tidak terdaftar")
+            console.log(error);
+        })
+}
 
   //Cara 2
   const [inForm, setInform] = React.useState({
@@ -20,7 +44,7 @@ const ModalLogin = (props) => {
   }
 
   const handleLogin = () => {
-    alert(`${inForm.email} ${inForm.password}`)
+    getUser();
   }
 
   const [showPassword, setShowPassword] = React.useState(false)
