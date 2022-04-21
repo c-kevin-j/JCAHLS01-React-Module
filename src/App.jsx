@@ -11,8 +11,13 @@ import Axios from 'axios';
 import { useEffect } from 'react';
 import { API_URL } from './helper';
 import React from 'react';
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import { getProductsAction } from './redux/actions/productsAction';
+import { loginAction } from './redux/actions/usersAction';
+import TransactionsAdminPage from './pages/TransactionsAdmin';
+import CartPage from './pages/Cart';
+import TransactionsPage from './pages/Transactions';
+import NotFoundPage from './pages/404';
 
 
 // FUNCTIONAL COMPONENT
@@ -21,9 +26,13 @@ function App() {
 
   // untuk mengeksekusi action pada redux, dan menghubungkan ke reducer
   const dispatch = useDispatch();
+  
   // function & data => misal ada data yang ingin digunakan
-  let data = []
-
+  const { role } = useSelector((state)=>{
+    return{
+      role: state.usersReducer.role
+    }
+  })
 
   const getProducts = () => {
     Axios.get(`${API_URL}/products`)
@@ -34,8 +43,23 @@ function App() {
     })
   }
 
+  const keepLogin = () => {
+    let token = localStorage.getItem("tokenIdUser")
+    console.log(token)
+    if (token) {
+      Axios.get(`${API_URL}/users?id=${token}`)
+      .then((res)=>{
+        localStorage.setItem("tokenIdUser", res.data[0].id)
+        dispatch(loginAction(res.data[0]))
+      }).catch((error)=>{
+        console.log(error)
+      })
+    }
+  }
+
   React.useEffect(() => {
     getProducts();
+    keepLogin();
   }, [])
 
   //return html component
@@ -46,8 +70,20 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />}/>
         <Route path="/products" element={<ProductsPage />}/>
-        <Route path="/products/admin" element={<ProductsAdmin />}/>
         <Route path="/product/detail" element={<ProductDetail />}/>
+        {
+          role==="admin"?
+          <>
+            <Route path="/products/admin" element={<ProductsAdmin />}/>
+            <Route path="/transactions/admin" element={<TransactionsAdminPage />}/>
+          </>
+          :
+          <>
+            <Route path="/cart" element={<CartPage />}/>
+            <Route path="/transactions" element={<TransactionsPage />}/>
+          </>
+        }
+        <Route path="*" element={<NotFoundPage />}/>
       </Routes>
     </div>
   );

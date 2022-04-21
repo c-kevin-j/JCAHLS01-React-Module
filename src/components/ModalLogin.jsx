@@ -6,32 +6,13 @@ import { useDispatch } from "react-redux";
 import { loginAction } from "../redux/actions/usersAction";
 
 const ModalLogin = (props) => {
-  let email=""
-  let password = ""
+  // let email=""
+  // let password = ""
 
-  const buttonLogin = () => {
-    props.handleLogin(email,password)
-  }
+  // const buttonLogin = () => {
+  //   props.handleLogin(email,password)
+  // }
   const dispatch = useDispatch();
-
-  const getUser = () => {
-    Axios.get(`${API_URL}/users?email=${inForm.email}`)
-        .then((response) => {
-            // jika berhasil mendapatkan response
-            console.log("From Component :", response.data[0]);
-            // setDbProducts(response.data)
-            if (inForm.password === response.data[0].password){
-              dispatch(loginAction(response.data[0]))
-              props.toggleOpen()
-            } else {
-              alert("Password Salah")
-            }
-        }).catch((error) => {
-            // jika tidak berhasil mendapatkan response
-            alert("Email tidak terdaftar")
-            console.log(error);
-        })
-}
 
   //Cara 2
   const [inForm, setInform] = React.useState({
@@ -44,7 +25,30 @@ const ModalLogin = (props) => {
   }
 
   const handleLogin = () => {
-    getUser();
+    if (inForm.email==="" || inForm.password ===""){
+      alert("Fill in all form")
+    } else {
+      if (inForm.email.includes("@")){
+        Axios.get(`${API_URL}/users?email=${inForm.email}`)
+            .then((response) => {
+                // jika berhasil mendapatkan response
+                if (inForm.password === response.data[0].password){
+                  // menyimpan data token pada browser
+                  localStorage.setItem("tokenIdUser", response.data[0].id)
+                  dispatch(loginAction(response.data[0]))
+                  props.toggleOpen()
+                } else {
+                  alert("Password Salah")
+                }
+            }).catch((error) => {
+                // jika tidak berhasil mendapatkan response
+                alert("Email tidak terdaftar")
+                console.log(error);
+            })
+      } else {
+        alert("Email wrong")
+      }
+    }
   }
 
   const [showPassword, setShowPassword] = React.useState(false)

@@ -3,10 +3,13 @@ import { Navbar, NavbarBrand, NavbarToggler, Collapse, Nav, NavItem, NavbarText,
 import ModalLogin from "./ModalLogin"
 import { useSelector } from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { logoutAction } from "../redux/actions/usersAction";
 
 const NavbarComponent = (props) => {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [openCollapse, setOpenCollapse] = React.useState(false)
   const [openModal, setOpenModal] = React.useState(false)
@@ -17,9 +20,10 @@ const NavbarComponent = (props) => {
     console.log("password",inputPassword)
   }
 
-  const { username } = useSelector((state) => {
+  const { username, role } = useSelector((state) => {
     return {
-        username: state.usersReducer.username
+        username: state.usersReducer.username,
+        role: state.usersReducer.role
     }
   })
 
@@ -107,11 +111,30 @@ const NavbarComponent = (props) => {
                   <DropdownItem>
                     Profile
                   </DropdownItem>
-                  <DropdownItem>
-                    Cart
-                  </DropdownItem>
-                  <DropdownItem>
-                    Transactions
+                  {
+                    role==="user" ?
+                    <>
+                      <DropdownItem onClick={()=>navigate("/cart")}>
+                        Cart
+                      </DropdownItem>
+                      <DropdownItem onClick={()=>navigate("/transactions")}>
+                        Transactions
+                      </DropdownItem>
+                    </>
+                    :
+                    <>
+                      <DropdownItem onClick={()=>navigate("/products/admin")}>
+                        Management Products
+                      </DropdownItem>
+                      <DropdownItem onClick={()=>navigate("/transactions/admin")}>
+                        Management Transactions
+                      </DropdownItem>
+                    </>
+                  }
+                  <DropdownItem divider/>
+                  <DropdownItem onClick={()=>{dispatch(logoutAction())
+                  navigate("/")}}> 
+                    Logout
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
