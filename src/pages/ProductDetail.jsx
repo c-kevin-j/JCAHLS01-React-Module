@@ -1,8 +1,9 @@
 import React from 'react';
 import Axios from 'axios';
 import { API_URL } from '../helper';
-import { Button, Collapse, Toast, ToastBody, ToastHeader } from 'reactstrap';
+import { Button, Collapse, Input, Toast, ToastBody, ToastHeader } from 'reactstrap';
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux';
 
 const ProductDetail = (props) => {
   const navigate = useNavigate();
@@ -14,6 +15,13 @@ const ProductDetail = (props) => {
   const [openType, setOpenType] = React.useState(false);
   let [qty, setQty] = React.useState(1);
   const [openToast, setOpenToast] = React.useState(false);
+  const [toastMsg, setToastMsg] = React.useState("")
+
+  const{ role } = useSelector((state)=>{
+    return{
+      role: state.usersReducer.role
+    }
+  })
 
   React.useEffect(() => {
     getDetail()
@@ -50,20 +58,57 @@ const ProductDetail = (props) => {
 
   const handleIncrement = () => {
     let temp = qty;
-    if (temp < selectedType.qty) {
-      temp++
-      setQty(temp)
+    if (selectedType.qty) {
+      if (temp < selectedType.qty) {
+        temp++
+        setQty(temp)
+      } else {
+        setToastMsg("Stock tidak mencukupi")
+        setOpenToast(!openToast)
+      }
     } else {
-      setOpenToast(true)
+      setToastMsg("Pilih tipe terlebih dahulu")
+      setOpenToast(!openToast)
     }
   }
   
   const handleDecrement = () => {
     let temp = qty
-    setOpenToast(false)
     if (temp > 1) {
       temp--
       setQty(temp)
+    }
+  }
+
+  const handleQty = (e) => {
+    if (parseInt(e.target.value) > 0 && parseInt(e.target.value) < selectedType.qty ){
+      setOpenToast(false)
+      setQty(parseInt(e.target.value))
+    } else if (parseInt(e.target.value) > selectedType.qty) {
+      setToastMsg("Stock tidak mencukupi")
+      setOpenToast(!openToast)
+      setQty(selectedType.qty)
+    }
+  }
+
+  if (openToast) {
+    setTimeout(()=>{
+      setOpenToast(false)
+    },3500)
+  }
+
+  const handleAddToCart = () => {
+    
+    if ( role === "user") {
+      if (selectedType.qty) {
+        
+      } else {
+        setToastMsg("Pilih tipe terlebih dahulu")
+        setOpenToast(!openToast)
+      }
+    } else {
+      setToastMsg("Silahkan login sebagai user terlebih dahulu")
+      setOpenToast(!openToast)
     }
   }
 
@@ -71,11 +116,12 @@ const ProductDetail = (props) => {
     <div>
       <div className="position-fixed top-10 end-0" >
         <Toast isOpen={openToast}>
-          <ToastHeader>
-            <button type="button" class="btn-close" onClick={() => setOpenToast(false)}></button>
+          <ToastHeader toggle={()=>setOpenToast(!openToast)}>
+            Add to cart warning
+            {/* <button type="button" className="btn-close" onClick={() => setOpenToast(false)}></button> */}
           </ToastHeader>
           <ToastBody icon="danger">
-            Jumlah pembelian melebihi jumlah stock
+            {toastMsg}
           </ToastBody>
         </Toast>
       </div>
@@ -133,13 +179,16 @@ const ProductDetail = (props) => {
                   <Button onClick={handleDecrement} className="material-icons p-1 text-white shadow-sm" style={{ cursor: 'pointer', backgroundColor: "#9C867B", borderRadius: "45px" }} >
                     -
                   </Button>
-                  <span size="sm" style={{ width: "40%", fontSize: "24px", fontWeight: "bolder", textAlign: "center", border: 0 }}>{qty}</span>
+                  {/* <span size="sm" style={{ width: "40%", fontSize: "24px", fontWeight: "bolder", textAlign: "center", border: 0 }}>{qty}</span> */}
+                  <input size="sm" placeholder="qty" style={{ width: "40%", fontSize: "24px", fontWeight: "bolder", textAlign: "center", border: 0 }} value={qty} onChange={handleQty}/>
                   <Button onClick={handleIncrement} className="material-icons p-1 text-white shadow-sm" style={{ cursor: 'pointer', backgroundColor: "#9C867B", borderRadius: "45px" }} >
                     +
                   </Button>
                 </span>
               </div>
-              <Button type="button" color="secondary" outline style={{ width: '100%' }} >Add to cart</Button>
+              <Button type="button" color="secondary" outline style={{ width: '100%' }} onClick={handleAddToCart}>
+                Masukkan ke Keranjang
+              </Button>
             </div>
           </>
         }
