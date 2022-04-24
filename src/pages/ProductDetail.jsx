@@ -4,9 +4,13 @@ import { API_URL } from '../helper';
 import { Button, Collapse, Input, Toast, ToastBody, ToastHeader } from 'reactstrap';
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { updateCartAction } from '../redux/actions/usersAction';
 
 const ProductDetail = (props) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { state, search } = useLocation()
 
   const [detail, setDetail] = React.useState({});
@@ -17,9 +21,11 @@ const ProductDetail = (props) => {
   const [openToast, setOpenToast] = React.useState(false);
   const [toastMsg, setToastMsg] = React.useState("")
 
-  const{ role } = useSelector((state)=>{
-    return{
-      role: state.usersReducer.role
+  const { id, role, cart } = useSelector((state) => {
+    return {
+      id: state.usersReducer.id,
+      role: state.usersReducer.role,
+      cart: state.usersReducer.cart,
     }
   })
 
@@ -71,7 +77,7 @@ const ProductDetail = (props) => {
       setOpenToast(!openToast)
     }
   }
-  
+
   const handleDecrement = () => {
     let temp = qty
     if (temp > 1) {
@@ -81,7 +87,7 @@ const ProductDetail = (props) => {
   }
 
   const handleQty = (e) => {
-    if (parseInt(e.target.value) > 0 && parseInt(e.target.value) < selectedType.qty ){
+    if (parseInt(e.target.value) > 0 && parseInt(e.target.value) < selectedType.qty) {
       setOpenToast(false)
       setQty(parseInt(e.target.value))
     } else if (parseInt(e.target.value) > selectedType.qty) {
@@ -92,31 +98,74 @@ const ProductDetail = (props) => {
   }
 
   if (openToast) {
-    setTimeout(()=>{
+    setTimeout(() => {
       setOpenToast(false)
-    },3500)
+    }, 3500)
   }
 
   const handleAddToCart = () => {
-    
-    if ( role === "user") {
-      if (selectedType.qty) {
-        
+    if (role == "user") {
+      if (selectedType.type) {
+        // fungsi menambah produk kedalam keranjang
+        let product = {
+          idProduct: detail.id,
+          img: detail.images[0],
+          nama: detail.nama,
+          type: selectedType.type,
+          qty,
+          harga: detail.harga
+        };
+
+        if (cart.length > 0) {
+          let checkCart = false
+          for (let i = 0; i < cart.length; i++) {
+            if (cart[i].idProduct === detail.id && cart[i].type === selectedType.type) {
+              cart[i].qty += qty;
+              checkCart = true;
+            }
+          }
+          if (checkCart == false) {
+            cart.push(product)
+          }
+
+          //cara 2
+          // let filterCart = cart.findIndex((val, idx) => val.idProduct === detail.id && val.type === selectedType.type)
+          // if (filterCart >= 0){
+          //   cart[filterCart].qty += qty;
+          // } else {
+          //   cart.push(product)
+          // }
+
+        } else {
+          cart.push(product)
+        }
+
+
+        Axios.patch(`${API_URL}/users/${id}`, {
+          cart
+        }).then((res) => {
+          // console.log(res.data)
+          dispatch(updateCartAction(res.data.cart))
+          alert("Add product success ✅")
+        }).catch((err) => {
+          console.log(err)
+        })
       } else {
-        setToastMsg("Pilih tipe terlebih dahulu")
         setOpenToast(!openToast)
+        setToastMsg("Pilih type terlebih dahulu")
       }
     } else {
-      setToastMsg("Silahkan login sebagai user terlebih dahulu")
-      setOpenToast(!openToast)
+      setOpenToast(!openToast);
+      setToastMsg("Silahkan login sebagai user terlebih dahulu");
     }
+
   }
 
   return (
     <div>
       <div className="position-fixed top-10 end-0" >
         <Toast isOpen={openToast}>
-          <ToastHeader toggle={()=>setOpenToast(!openToast)}>
+          <ToastHeader toggle={() => setOpenToast(!openToast)}>
             Add to cart warning
             {/* <button type="button" className="btn-close" onClick={() => setOpenToast(false)}></button> */}
           </ToastHeader>
@@ -180,7 +229,7 @@ const ProductDetail = (props) => {
                     -
                   </Button>
                   {/* <span size="sm" style={{ width: "40%", fontSize: "24px", fontWeight: "bolder", textAlign: "center", border: 0 }}>{qty}</span> */}
-                  <input size="sm" placeholder="qty" style={{ width: "40%", fontSize: "24px", fontWeight: "bolder", textAlign: "center", border: 0 }} value={qty} onChange={handleQty}/>
+                  <Input size="sm" placeholder="qty" style={{ width: "40%", fontSize: "24px", fontWeight: "bolder", textAlign: "center", border: 0 }} value={qty} onChange={handleQty} />
                   <Button onClick={handleIncrement} className="material-icons p-1 text-white shadow-sm" style={{ cursor: 'pointer', backgroundColor: "#9C867B", borderRadius: "45px" }} >
                     +
                   </Button>

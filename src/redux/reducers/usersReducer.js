@@ -12,6 +12,8 @@ export const usersReducer = (state = INITIAL_STATE, action) => {
     case "LOGIN_SUCCESS":
       console.log("DAPAT DATA DARI ACTION", action.payload)
       return { ...state, ...action.payload };
+    case "ADD_TO_CART":
+        return {...state, cart : action.payload }
     case "LOGOUT":
       return INITIAL_STATE;
     default:

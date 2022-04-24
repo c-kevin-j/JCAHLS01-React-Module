@@ -13,3 +13,10 @@ export const logoutAction = () => {
     type: "LOGOUT"
   }
 }
+
+export const updateCartAction = (data) => {
+  return {
+    type: "ADD_TO_CART",
+    payload: data
+  }
+}
