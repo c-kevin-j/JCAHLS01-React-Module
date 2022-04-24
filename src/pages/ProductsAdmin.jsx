@@ -3,6 +3,7 @@ import Axios from 'axios';
 import { API_URL } from '../helper';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 import ModalDetail from "../components/ModalDetail";
+import ModalAddProduct from "../components/ModalAddProduct";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductsAction } from "../redux/actions/productsAction";
@@ -24,6 +25,7 @@ const ProductsAdmin = (props) => {
   const [paginate, setPaginate] = React.useState(1)
   const [limit, setLimit] = React.useState(5)
   const [productsLength, setProductsLength] = React.useState(0)
+  const [openAddProduct, setOpenAddProduct] = React.useState(false)
 
   const { products } = useSelector((state) => {
     return {
@@ -211,15 +213,28 @@ const ProductsAdmin = (props) => {
     return btn;
 }
 
+  const openModalAddProduct = () => {
+    setOpenAddProduct(!openAddProduct);
+  }
+
   return (
     <div className="container py-4">
-      <h3>Products Admin</h3>
+      <div className="row">
+        <h3 className="col-11">Products Admin</h3>
+        <div className="col-1 text-end">
+          <button type="button" className="btn btn-success" onClick={()=>setOpenAddProduct(!openAddProduct)}>+</button>
+          <ModalAddProduct 
+            openAddProduct={openAddProduct}
+            toggleAddProduct={()=>setOpenAddProduct(!openAddProduct)}
+          />
+        </div>
+      </div>
       {
         selectedIdx >= 0 && selectedIdx != null ?
           <ModalDetail
             openDetail={openModal}
             toggle={handleToggle}
-            data={dbProducts[selectedIdx]}
+            data={products[selectedIdx]}
           />
           :
           null
