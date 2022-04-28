@@ -3,18 +3,18 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, L
 import Axios from "axios";
 import { API_URL } from "../helper";
 import { useDispatch } from "react-redux";
+import { getProductsAction } from "../redux/actions/productsAction";
 
-const ModalAddProduct = (props) => {
+const ModalEditProduct = (props) => {
 
   const dispatch = useDispatch();
-  // const [formAddProduct, setFormAddProduct] = React.useState({})
-  const [formNama,setFormNama] = React.useState("")
-  const [formDeskripsi,setFormDeskripsi] = React.useState("")
-  const [formBrand,setFormBrand] = React.useState("")
-  const [formKategori,setFormKategori] = React.useState("")
-  const [formHarga,setFormHarga] = React.useState(0)
-  const [formStock,setFormStock] = React.useState([])
-  const [formImages,setFormImages] = React.useState([])
+  const [formNama,setFormNama] = React.useState(props.data.nama)
+  const [formDeskripsi,setFormDeskripsi] = React.useState(props.data.deskripsi)
+  const [formBrand,setFormBrand] = React.useState(props.data.brand)
+  const [formKategori,setFormKategori] = React.useState(props.data.kategori)
+  const [formHarga,setFormHarga] = React.useState(props.data.harga)
+  const [formStock,setFormStock] = React.useState(props.data.stock)
+  const [formImages,setFormImages] = React.useState(props.data.images)
 
   const handleInputStock = (value, index, property) => {
     let temp = [...formStock];
@@ -131,17 +131,8 @@ const ModalAddProduct = (props) => {
         console.log('harga',formHarga)
         console.log('stock',formStock)
         console.log('images',formImages)
-        // setFormAddProduct({
-        //   nama:formNama,
-        //   deskripsi:formDeskripsi,
-        //   brand:formBrand,
-        //   kategori:formKategori,
-        //   harga:formHarga,
-        //   stock:formStock,
-        //   images:formImages,
-        // })
-        // console.log(formAddProduct)
-        let res = await Axios.post(`${API_URL}/products`, {
+
+        let res = await Axios.patch(`${API_URL}/products/${props.data.id}`, {
           nama:formNama,
           deskripsi:formDeskripsi,
           brand:formBrand,
@@ -159,9 +150,8 @@ const ModalAddProduct = (props) => {
         //   stock:formStock,
         //   images:formImages,
         // }))
-        
         if(res){
-          alert("Penambahan Produk Berhasil")
+          alert("Edit Produk Berhasil")
           setFormNama("")
           setFormDeskripsi("")
           setFormBrand("")
@@ -169,8 +159,16 @@ const ModalAddProduct = (props) => {
           setFormHarga(0)
           setFormStock([])
           setFormImages([])
+
           
-          props.toggleAddProduct()
+          await Axios.get(`${API_URL}/products`)
+          .then((response)=>{
+            dispatch(getProductsAction(response.data))
+          }).catch((error)=>{
+            console.log(error)
+          })
+
+          props.toggle()
         }
       } else {
         alert("Isi Semua Form")
@@ -181,21 +179,22 @@ const ModalAddProduct = (props) => {
 
   }
 
-  return <Modal size="lg" isOpen={props.openAddProduct} toggle={props.toggleAddProduct}>
-    <ModalHeader>
-      Add Product  
-    </ModalHeader> 
-    <ModalBody>
+  console.log(props.data)
+  return <Modal size="lg" isOpen={props.openDetail} toggle={props.toggle}>
+      <ModalHeader>
+        Edit Product
+      </ModalHeader>
+      <ModalBody>
       <Form>
         <FormGroup>
           <div className="row">
             <div className="col-12 col-md-6">
               <Label>Nama Produk</Label>
-              <Input type="text" onChange={(event) => setFormNama(event.target.value)}/>
+              <Input type="text" value={formNama} onChange={(event) => setFormNama(event.target.value)}/>
               <div className="row py-2">
                 <div className="col-6">
                   <Label>Brand</Label>
-                  <Input type="select" onChange={(event) => setFormBrand(event.target.value)}>
+                  <Input type="select" value={formBrand} onChange={(event) => setFormBrand(event.target.value)}>
                     <option value={""}>Choose..</option>
                     <option value="IKEA">IKEA</option>
                     <option value="Mr.DIY">Mr.DIY</option>
@@ -203,7 +202,7 @@ const ModalAddProduct = (props) => {
                 </div>
                 <div className="col-6">
                   <Label>Kategori</Label>
-                  <Input type="select" onChange={(event) => setFormKategori(event.target.value)}>
+                  <Input type="select" value={formKategori} onChange={(event) => setFormKategori(event.target.value)}>
                     <option value={""}>Choose..</option>
                     <option value="Living Room">Living Room</option>
                     <option value="Kitchen">Kitchen</option>
@@ -212,9 +211,9 @@ const ModalAddProduct = (props) => {
                 </div>
               </div>
               <Label>Harga</Label>
-              <Input type="number" onChange={(event) => setFormHarga(parseInt(event.target.value))}/>
+              <Input type="number" value={formHarga} onChange={(event) => setFormHarga(parseInt(event.target.value))}/>
               <Label>Deskripsi</Label>
-              <Input type="textarea" onChange={(event) => setFormDeskripsi(event.target.value)}/>
+              <Input type="textarea" value={formDeskripsi} onChange={(event) => setFormDeskripsi(event.target.value)}/>
             </div>
 
             <div className="col-12 col-md-6">
@@ -254,8 +253,9 @@ const ModalAddProduct = (props) => {
       <Button color="primary" type="button" onClick={handleSubmit}>Submit</Button>
       <Button color="secondary" type="button" onClick={props.toggleAddProduct}>Cancel</Button>
     </ModalFooter> 
-    
-  </Modal>
+    </Modal>
+
+  
 }
 
-export default ModalAddProduct
+export default ModalEditProduct

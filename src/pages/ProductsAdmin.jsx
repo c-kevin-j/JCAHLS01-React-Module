@@ -1,19 +1,18 @@
 import React from "react";
 import Axios from 'axios';
 import { API_URL } from '../helper';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
-import ModalDetail from "../components/ModalDetail";
+import { Button } from "reactstrap";
 import ModalAddProduct from "../components/ModalAddProduct";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductsAction } from "../redux/actions/productsAction";
+import ModalEditProduct from "../components/ModalEditProduct"
 
 
 const ProductsAdmin = (props) => {
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [dbProducts, setDbProducts] = React.useState([])
   const [openModal, setOpenModal] = React.useState(false)
   const [selectedIdx, setSelectedIdx] = React.useState(null)
   const [formFilter, setFormFilter] = React.useState({
@@ -213,10 +212,6 @@ const ProductsAdmin = (props) => {
     return btn;
 }
 
-  const openModalAddProduct = () => {
-    setOpenAddProduct(!openAddProduct);
-  }
-
   return (
     <div className="container py-4">
       <div className="row">
@@ -231,7 +226,7 @@ const ProductsAdmin = (props) => {
       </div>
       {
         selectedIdx >= 0 && selectedIdx != null ?
-          <ModalDetail
+          <ModalEditProduct
             openDetail={openModal}
             toggle={handleToggle}
             data={products[selectedIdx]}
