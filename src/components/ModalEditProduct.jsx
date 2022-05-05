@@ -159,7 +159,6 @@ const ModalEditProduct = (props) => {
           setFormHarga(0)
           setFormStock([])
           setFormImages([])
-
           
           await Axios.get(`${API_URL}/products`)
           .then((response)=>{
@@ -180,7 +179,7 @@ const ModalEditProduct = (props) => {
   }
 
   console.log(props.data)
-  return <Modal size="lg" isOpen={props.openDetail} toggle={props.toggle}>
+  return <Modal size="lg" isOpen={props.openModal} toggle={props.toggle}>
       <ModalHeader>
         Edit Product
       </ModalHeader>

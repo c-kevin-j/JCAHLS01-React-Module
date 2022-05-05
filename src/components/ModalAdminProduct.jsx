@@ -3,8 +3,9 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, L
 import Axios from "axios";
 import { API_URL } from "../helper";
 import { useDispatch } from "react-redux";
+import { getProductsAction } from "../redux/actions/productsAction";
 
-const ModalAddProduct = (props) => {
+const ModalAdminProduct = (props) => {
 
   const dispatch = useDispatch();
   // const [formAddProduct, setFormAddProduct] = React.useState({})
@@ -15,6 +16,18 @@ const ModalAddProduct = (props) => {
   const [formHarga,setFormHarga] = React.useState(0)
   const [formStock,setFormStock] = React.useState([])
   const [formImages,setFormImages] = React.useState([])
+
+  React.useEffect(()=>{
+    if (props.type === "edit"){
+      setFormNama(props.data.nama)
+      setFormDeskripsi(props.data.deskripsi)
+      setFormBrand(props.data.brand)
+      setFormKategori(props.data.kategori)
+      setFormHarga(props.data.harga)
+      setFormStock(props.data.stock)
+      setFormImages(props.data.images)
+    }
+  },[])
 
   const handleInputStock = (value, index, property) => {
     let temp = [...formStock];
@@ -141,15 +154,51 @@ const ModalAddProduct = (props) => {
         //   images:formImages,
         // })
         // console.log(formAddProduct)
-        let res = await Axios.post(`${API_URL}/products`, {
-          nama:formNama,
-          deskripsi:formDeskripsi,
-          brand:formBrand,
-          kategori:formKategori,
-          harga:formHarga,
-          stock:formStock,
-          images:formImages,
-        })
+        if (props.type === "add"){
+          let res = await Axios.post(`${API_URL}/products`, {
+            nama:formNama,
+            deskripsi:formDeskripsi,
+            brand:formBrand,
+            kategori:formKategori,
+            harga:formHarga,
+            stock:formStock,
+            images:formImages,
+          })
+          if(res){
+            alert("Penambahan Produk Berhasil")
+            // setFormNama("")
+            // setFormDeskripsi("")
+            // setFormBrand("")
+            // setFormKategori("")
+            // setFormHarga(0)
+            // setFormStock([])
+            // setFormImages([])
+            
+            props.toggle()
+          }
+        } else if(props.type === "edit"){
+          let res = await Axios.patch(`${API_URL}/products/${props.data.id}`, {
+            nama:formNama,
+            deskripsi:formDeskripsi,
+            brand:formBrand,
+            kategori:formKategori,
+            harga:formHarga,
+            stock:formStock,
+            images:formImages,
+          })
+          if(res){
+            alert("Edit Produk Berhasil")
+            
+            await Axios.get(`${API_URL}/products`)
+            .then((response)=>{
+              dispatch(getProductsAction(response.data))
+            }).catch((error)=>{
+              console.log(error)
+            })
+  
+            props.toggle()
+          }
+        }
         // dispatch(addProductAction({
         //   nama:formNama,
         //   deskripsi:formDeskripsi,
@@ -160,18 +209,7 @@ const ModalAddProduct = (props) => {
         //   images:formImages,
         // }))
         
-        if(res){
-          alert("Penambahan Produk Berhasil")
-          setFormNama("")
-          setFormDeskripsi("")
-          setFormBrand("")
-          setFormKategori("")
-          setFormHarga(0)
-          setFormStock([])
-          setFormImages([])
-          
-          props.toggleAddProduct()
-        }
+        
       } else {
         alert("Isi Semua Form")
       }
@@ -181,7 +219,7 @@ const ModalAddProduct = (props) => {
 
   }
 
-  return <Modal size="lg" isOpen={props.openAddProduct} toggle={props.toggleAddProduct}>
+  return <Modal size="lg" isOpen={props.openModal} toggle={props.toggle}>
     <ModalHeader>
       Add Product  
     </ModalHeader> 
@@ -191,11 +229,11 @@ const ModalAddProduct = (props) => {
           <div className="row">
             <div className="col-12 col-md-6">
               <Label>Nama Produk</Label>
-              <Input type="text" onChange={(event) => setFormNama(event.target.value)}/>
+              <Input type="text" value={formNama} onChange={(event) => setFormNama(event.target.value)}/>
               <div className="row py-2">
                 <div className="col-6">
                   <Label>Brand</Label>
-                  <Input type="select" onChange={(event) => setFormBrand(event.target.value)}>
+                  <Input type="select" value={formBrand} onChange={(event) => setFormBrand(event.target.value)}>
                     <option value={""}>Choose..</option>
                     <option value="IKEA">IKEA</option>
                     <option value="Mr.DIY">Mr.DIY</option>
@@ -203,7 +241,7 @@ const ModalAddProduct = (props) => {
                 </div>
                 <div className="col-6">
                   <Label>Kategori</Label>
-                  <Input type="select" onChange={(event) => setFormKategori(event.target.value)}>
+                  <Input type="select" value={formKategori} onChange={(event) => setFormKategori(event.target.value)}>
                     <option value={""}>Choose..</option>
                     <option value="Living Room">Living Room</option>
                     <option value="Kitchen">Kitchen</option>
@@ -212,9 +250,9 @@ const ModalAddProduct = (props) => {
                 </div>
               </div>
               <Label>Harga</Label>
-              <Input type="number" onChange={(event) => setFormHarga(parseInt(event.target.value))}/>
+              <Input type="number" value={formHarga} onChange={(event) => setFormHarga(parseInt(event.target.value))}/>
               <Label>Deskripsi</Label>
-              <Input type="textarea" onChange={(event) => setFormDeskripsi(event.target.value)}/>
+              <Input type="textarea" value={formDeskripsi} onChange={(event) => setFormDeskripsi(event.target.value)}/>
             </div>
 
             <div className="col-12 col-md-6">
@@ -243,19 +281,16 @@ const ModalAddProduct = (props) => {
               </div>
             </div>
           </div>
-            
-          
-          
-          
+                    
         </FormGroup>
       </Form>
     </ModalBody>
     <ModalFooter>
       <Button color="primary" type="button" onClick={handleSubmit}>Submit</Button>
-      <Button color="secondary" type="button" onClick={props.toggleAddProduct}>Cancel</Button>
+      <Button color="secondary" type="button" onClick={props.toggle}>Cancel</Button>
     </ModalFooter> 
     
   </Modal>
 }
 
-export default ModalAddProduct
+export default ModalAdminProduct

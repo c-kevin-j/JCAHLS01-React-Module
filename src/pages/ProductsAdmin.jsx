@@ -2,12 +2,10 @@ import React from "react";
 import Axios from 'axios';
 import { API_URL } from '../helper';
 import { Button } from "reactstrap";
-import ModalAddProduct from "../components/ModalAddProduct";
+import ModalAdminProduct from "../components/ModalAdminProduct";
 // import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductsAction } from "../redux/actions/productsAction";
-import ModalEditProduct from "../components/ModalEditProduct"
-
 
 const ProductsAdmin = (props) => {
 
@@ -218,18 +216,20 @@ const ProductsAdmin = (props) => {
         <h3 className="col-11">Products Admin</h3>
         <div className="col-1 text-end">
           <button type="button" className="btn btn-success" onClick={()=>setOpenAddProduct(!openAddProduct)}>+</button>
-          <ModalAddProduct 
-            openAddProduct={openAddProduct}
-            toggleAddProduct={()=>setOpenAddProduct(!openAddProduct)}
+          <ModalAdminProduct 
+            openModal={openAddProduct}
+            toggle={()=>setOpenAddProduct(!openAddProduct)}
+            type="add"
           />
         </div>
       </div>
       {
         selectedIdx >= 0 && selectedIdx != null ?
-          <ModalEditProduct
-            openDetail={openModal}
+          <ModalAdminProduct
+            openModal={openModal}
             toggle={handleToggle}
             data={products[selectedIdx]}
+            type="edit"
           />
           :
           null
