@@ -5,7 +5,8 @@ import { Button, Collapse, Input, Toast, ToastBody, ToastHeader } from 'reactstr
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { updateCartAction } from '../redux/actions/usersAction';
+import { updateCartAction, updateCart } from '../redux/actions/usersAction';
+import { getDetail } from '../redux/actions/productsAction';
 
 const ProductDetail = (props) => {
   const navigate = useNavigate();
@@ -30,12 +31,13 @@ const ProductDetail = (props) => {
   })
 
   React.useEffect(() => {
-    getDetail()
+    getDetailProduct()
   }, []);
 
 
-  const getDetail = () => {
+  const getDetailProduct = () => {
     console.log(search)
+
     Axios.get(`${API_URL}/products${search}`)
       .then((response) => {
         // jika berhasil mendapatkan response
@@ -44,6 +46,8 @@ const ProductDetail = (props) => {
         // jika tidak berhasil mendapatkan response
         console.log(error);
       })
+    let dataDetail = dispatch(getDetail(search))
+    console.log(dataDetail)
   }
 
   const renderImages = () => {
@@ -140,16 +144,20 @@ const ProductDetail = (props) => {
           cart.push(product)
         }
 
+        // Axios.patch(`${API_URL}/users/${id}`, {
+        //   cart
+        // }).then((res) => {
+        //   // console.log(res.data)
+        //   dispatch(updateCartAction(res.data.cart))
+        //   alert("Add product success ✅")
+        // }).catch((err) => {
+        //   console.log(err)
+        // })
+        console.log(cart)
+        console.log(product)
+        dispatch(updateCart(id,cart))
+        alert("Add product success ✅")
 
-        Axios.patch(`${API_URL}/users/${id}`, {
-          cart
-        }).then((res) => {
-          // console.log(res.data)
-          dispatch(updateCartAction(res.data.cart))
-          alert("Add product success ✅")
-        }).catch((err) => {
-          console.log(err)
-        })
       } else {
         setOpenToast(!openToast)
         setToastMsg("Pilih type terlebih dahulu")

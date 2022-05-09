@@ -12,8 +12,8 @@ import { useEffect } from 'react';
 import { API_URL } from './helper';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux'
-import { getProductsAction } from './redux/actions/productsAction';
-import { loginAction } from './redux/actions/usersAction';
+import { getProductsAction, getProducts } from './redux/actions/productsAction';
+import { loginAction, keepLogin } from './redux/actions/usersAction';
 import TransactionsAdminPage from './pages/TransactionsAdmin';
 import CartPage from './pages/Cart';
 import TransactionsPage from './pages/Transactions';
@@ -34,32 +34,32 @@ function App() {
     }
   })
 
-  const getProducts = () => {
-    Axios.get(`${API_URL}/products`)
-    .then((response)=>{
-      dispatch(getProductsAction(response.data))
-    }).catch((error)=>{
-      console.log(error)
-    })
-  }
+  // const getProducts = () => {
+  //   Axios.get(`${API_URL}/products`)
+  //   .then((response)=>{
+  //     dispatch(getProductsAction(response.data))
+  //   }).catch((error)=>{
+  //     console.log(error)
+  //   })
+  // }
 
-  const keepLogin = () => {
-    let token = localStorage.getItem("tokenIdUser")
-    console.log(token)
-    if (token) {
-      Axios.get(`${API_URL}/users?id=${token}`)
-      .then((res)=>{
-        localStorage.setItem("tokenIdUser", res.data[0].id)
-        dispatch(loginAction(res.data[0]))
-      }).catch((error)=>{
-        console.log(error)
-      })
-    }
-  }
+  // const keepLogin = () => {
+  //   let token = localStorage.getItem("tokenIdUser")
+  //   console.log(token)
+  //   if (token) {
+  //     Axios.get(`${API_URL}/users?id=${token}`)
+  //     .then((res)=>{
+  //       localStorage.setItem("tokenIdUser", res.data[0].id)
+  //       dispatch(loginAction(res.data[0]))
+  //     }).catch((error)=>{
+  //       console.log(error)
+  //     })
+  //   }
+  // }
 
   React.useEffect(() => {
-    getProducts();
-    keepLogin();
+    dispatch(getProducts());
+    dispatch(keepLogin());
   }, [])
 
   //return html component

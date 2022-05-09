@@ -3,7 +3,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, L
 import Axios from "axios";
 import { API_URL } from "../helper";
 import { useDispatch } from "react-redux";
-import { loginAction } from "../redux/actions/usersAction";
+import { loginAction, userLogin } from "../redux/actions/usersAction";
 
 const ModalLogin = (props) => {
   // let email=""
@@ -29,22 +29,23 @@ const ModalLogin = (props) => {
       alert("Fill in all form")
     } else {
       if (inForm.email.includes("@")){
-        Axios.get(`${API_URL}/users?email=${inForm.email}`)
-            .then((response) => {
-                // jika berhasil mendapatkan response
-                if (inForm.password === response.data[0].password){
-                  // menyimpan data token pada browser
-                  localStorage.setItem("tokenIdUser", response.data[0].id)
-                  dispatch(loginAction(response.data[0]))
-                  props.toggleOpen()
-                } else {
-                  alert("Password Salah")
-                }
-            }).catch((error) => {
-                // jika tidak berhasil mendapatkan response
-                alert("Email tidak terdaftar")
-                console.log(error);
-            })
+        // Axios.get(`${API_URL}/users?email=${inForm.email}`)
+        //     .then((response) => {
+        //         // jika berhasil mendapatkan response
+        //         if (inForm.password === response.data[0].password){
+        //           // menyimpan data token pada browser
+        //           localStorage.setItem("tokenIdUser", response.data[0].id)
+        //           dispatch(loginAction(response.data[0]))
+        //           props.toggleOpen()
+        //         } else {
+        //           alert("Password Salah")
+        //         }
+        //     }).catch((error) => {
+        //         // jika tidak berhasil mendapatkan response
+        //         alert("Email tidak terdaftar")
+        //         console.log(error);
+        //     })
+        dispatch(userLogin(inForm, props))
       } else {
         alert("Email wrong")
       }

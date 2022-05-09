@@ -3,7 +3,7 @@ import { FormGroup, Input, Label, Button } from "reactstrap";
 import Axios from "axios";
 import { API_URL } from "../helper";
 import { useDispatch } from "react-redux";
-import { loginAction } from "../redux/actions/usersAction";
+import { loginAction, userRegister } from "../redux/actions/usersAction";
 import { useNavigate } from "react-router-dom";
 
 
@@ -24,17 +24,19 @@ const RegisterPage = (props) => {
         if (password !== confPassword) {
           alert("password not match")
         } else if (email.includes("@")) {
-          let res = await Axios.post(`${API_URL}/users`, {
-            username,
-            email,
-            password,
-            role: "user",
-            cart: []
-          })
+          // let res = await Axios.post(`${API_URL}/users`, {
+          //   username,
+          //   email,
+          //   password,
+          //   role: "user",
+          //   cart: []
+          // })
 
-          console.log ("Respon register", res.data)
-          dispatch(loginAction(res.data))
+          // // console.log ("Respon register", res.data)
+          // dispatch(loginAction(res.data))
+          
 
+          dispatch(userRegister(username, email, password))
           // otomatis redirect ke landing page
           navigate("/")
 

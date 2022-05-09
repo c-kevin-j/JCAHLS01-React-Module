@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { API_URL } from '../helper';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProductsAction } from '../redux/actions/productsAction';
+import { getProductsAction, getProducts, filterSort } from '../redux/actions/productsAction';
 
 
 const ProductsPage = (props) => {
@@ -27,20 +27,20 @@ const ProductsPage = (props) => {
     })
 
     React.useEffect(() => {
-        getProducts();
+        dispatch(getProducts());
     }, [])
 
-    const getProducts = () => {
-        Axios.get(`${API_URL}/products`)
-            .then((response) => {
-                // jika berhasil mendapatkan response
-                dispatch(getProductsAction(response.data))
+    // const getProducts = () => {
+    //     Axios.get(`${API_URL}/products`)
+    //         .then((response) => {
+    //             // jika berhasil mendapatkan response
+    //             dispatch(getProductsAction(response.data))
 
-            }).catch((error) => {
-                // jika gagal mendapatkan response
-                console.log(error);
-            })
-    }
+    //         }).catch((error) => {
+    //             // jika gagal mendapatkan response
+    //             console.log(error);
+    //         })
+    // }
 
     const getFilteredProducts = () => {
         let { filterName, minPrice, maxPrice } = formFilter
@@ -69,14 +69,15 @@ const ProductsPage = (props) => {
                 sortRule = `&_sort=nama&_order=desc`;
                 break;
         }
-        Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
-            .then((response) => {
-                // jika berhasil mendapatkan response
-                dispatch(getProductsAction(response.data))
-            }).catch((error) => {
-                // jika gagal mendapatkan response
-                console.log(error);
-            })
+        // Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
+        //     .then((res) => {
+        //         // jika berhasil mendapatkan response
+        //         dispatch(getProductsAction(res.data))
+        //     }).catch((error) => {
+        //         // jika gagal mendapatkan response
+        //         console.log(error);
+        //     })
+        dispatch(filterSort(byName, byPrice, sortRule))
     }
 
     const handleSort = (value) => {
@@ -107,12 +108,13 @@ const ProductsPage = (props) => {
                 break;
         }
 
-        Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
-            .then((res) => {
-                dispatch(getProductsAction(res.data))
-            }).catch((err) => {
-                console.log(err)
-            })
+        // Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
+        //     .then((res) => {
+        //         dispatch(getProductsAction(res.data))
+        //     }).catch((err) => {
+        //         console.log(err)
+        //     })
+        dispatch(filterSort(byName, byPrice, sortRule))
     }
 
     const printProducts = () => {
@@ -198,7 +200,7 @@ const ProductsPage = (props) => {
             maxPrice: Infinity,
             sortBy: ''
         })
-        getProducts();
+        dispatch(getProducts());
     }
 
     return (

@@ -5,7 +5,7 @@ import { Button } from "reactstrap";
 import ModalAdminProduct from "../components/ModalAdminProduct";
 // import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getProductsAction } from "../redux/actions/productsAction";
+import { getProductsAction, getProducts, filterSort, paginateProduct, deleteProduct } from "../redux/actions/productsAction";
 
 const ProductsAdmin = (props) => {
 
@@ -36,14 +36,15 @@ const ProductsAdmin = (props) => {
   }, [])
 
   const getProducts = (paginate=1) => {
-    Axios.get(`${API_URL}/products?_page=${paginate}&_limit=${limit}`)
-      .then((response) => {
-        // jika berhasil mendapatkan response
-        dispatch(getProductsAction(response.data))
-      }).catch((error) => {
-        // jika gagal mendapatkan response
-        console.log(error);
-      })
+    // Axios.get(`${API_URL}/products?_page=${paginate}&_limit=${limit}`)
+    //   .then((response) => {
+    //     // jika berhasil mendapatkan response
+    //     dispatch(getProductsAction(response.data))
+    //   }).catch((error) => {
+    //     // jika gagal mendapatkan response
+    //     console.log(error);
+    //   })
+      dispatch(paginateProduct(paginate,limit))
   }
 
   const getAllProducts = () => {
@@ -83,14 +84,15 @@ const ProductsAdmin = (props) => {
   }
 
   const handleDelete = (id) => {
-    // 1. Menghapus data pada server berdasarkan parameter id data produk
-    Axios.delete(`${API_URL}/products/${id}`)
-      .then((response) => {
-        // 2. Jika berhasil, get ulang data
-        getProducts()
-      }).catch((error) => {
-        console.log(error)
-      })
+    // // 1. Menghapus data pada server berdasarkan parameter id data produk
+    // Axios.delete(`${API_URL}/products/${id}`)
+    //   .then((response) => {
+    //     // 2. Jika berhasil, get ulang data
+    //   }).catch((error) => {
+    //     console.log(error)
+    //   })
+      dispatch(deleteProduct(id))
+      getProducts()
   }
 
   const handleDetail = (index) => {
@@ -130,14 +132,15 @@ const ProductsAdmin = (props) => {
         sortRule = `&_sort=nama&_order=desc`;
         break;
     }
-    Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
-      .then((response) => {
-        // jika berhasil mendapatkan response
-        dispatch(getProductsAction(response.data))
-      }).catch((error) => {
-        // jika gagal mendapatkan response
-        console.log(error);
-      })
+    // Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
+    //   .then((response) => {
+    //     // jika berhasil mendapatkan response
+    //     dispatch(getProductsAction(response.data))
+    //   }).catch((error) => {
+    //     // jika gagal mendapatkan response
+    //     console.log(error);
+    //   })
+    dispatch(filterSort(byName, byPrice, sortRule))
   }
 
   const handleSort = (value) => {
@@ -168,12 +171,13 @@ const ProductsAdmin = (props) => {
         break;
     }
 
-    Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
-      .then((res) => {
-        dispatch(getProductsAction(res.data))
-      }).catch((err) => {
-        console.log(err)
-      })
+    // Axios.get(`${API_URL}/products?${byName}${byPrice}${sortRule}`)
+    //   .then((res) => {
+    //     dispatch(getProductsAction(res.data))
+    //   }).catch((err) => {
+    //     console.log(err)
+    //   })
+    dispatch(filterSort(byName, byPrice, sortRule))
   }
 
   const handleInputFilter = (value, property) => {
