@@ -3,7 +3,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { API_URL } from "../helper";
 import { useDispatch } from "react-redux";
-import { updateCart, updateCartAction } from "../redux/actions/usersAction";
+import { updateCart } from "../redux/actions/usersAction";
 
 const CartPage = (props) => {
 
@@ -122,6 +122,7 @@ const CartPage = (props) => {
   let total = 0
 
   const printCart = () => {
+  
     total=0
     return cart.map((val,idx)=>{
       let subTotal = parseInt(val.harga) * parseInt(val.qty);
@@ -146,9 +147,9 @@ const CartPage = (props) => {
                 </div>
                 <div className="col-2 text-center">
                   <div className="row">
-                    <span className="col cursor-pointer" onClick={()=>handleDecrement(idx)}> - </span>
+                    <span className="col" style={{ cursor: "pointer" }} onClick={()=>handleDecrement(idx)}> - </span>
                     <input type="text" value={val.qty} className="col"/>
-                    <span className="col cursor-pointer" onClick={()=>handleIncrement(idx)}> + </span>
+                    <span className="col "style={{ cursor: "pointer" }} onClick={()=>handleIncrement(idx)}> + </span>
                   </div>
                 </div>
                 <div className="col-2 ">
@@ -166,8 +167,7 @@ const CartPage = (props) => {
     })
   }
 
-  const cardTotalPayment = () => {
-    
+  const cardTotalPayment = () => {  
     return <div className="card shadow">
     <div className="card-body">
       <h4>Total Payment</h4>

@@ -79,7 +79,6 @@ const ProductsAdmin = (props) => {
             </div>
           </td>
         </tr>
-      
     })
   }
 
